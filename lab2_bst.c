@@ -49,6 +49,7 @@ int lab2_node_print_inorder(lab2_tree *tree) {
 lab2_tree *lab2_tree_create() {
     // You need to implement lab2_tree_create function.
     struct lab2_tree *res = malloc (sizeof(struct lab2_tree));
+	pthread_mutex_init(&res->mutex, NULL);
 	res->root = NULL;
 	return res;
 }
@@ -118,11 +119,10 @@ int lab2_node_insert(lab2_tree *tree, lab2_node *new_node){
 int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
       // You need to implement lab2_node_insert_fg function.
     if (tree->root == NULL) {
-    	pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    	pthread_mutex_lock(&mutex);
+    	pthread_mutex_lock(&tree->mutex);
 		tree->root = new_node;
 		//printf("new root key : %d\n", new_node->key);
-		pthread_mutex_unlock(&mutex);
+		pthread_mutex_unlock(&tree->mutex);
 	}
 	else {
 		lab2_node *temp = tree->root;
@@ -160,8 +160,7 @@ int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
  */
 int lab2_node_insert_cg(lab2_tree *tree, lab2_node *new_node){
     // You need to implement lab2_node_insert_cg function.
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&tree->mutex);
     if (tree->root == NULL) {
 		tree->root = new_node;
 		//printf("new root key : %d\n", new_node->key);
@@ -186,7 +185,7 @@ int lab2_node_insert_cg(lab2_tree *tree, lab2_node *new_node){
 		}
 		//printf("new node key : %d\n", new_node->key);
 	}
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&tree->mutex);
 }
 
 /* 
@@ -335,45 +334,41 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
  		}
     	if (parent->left) {
     		if (temp->key == parent->left->key) {
-    			pthread_mutex_t tm = parent->left->mutex;
-				pthread_mutex_lock(&tm);
+				pthread_mutex_lock(&parent->mutex);
     			parent->left = NULL;
-				pthread_mutex_unlock(&tm);
+				pthread_mutex_unlock(&parent->mutex);
     		}
     		else {
-    			pthread_mutex_t tm = parent->right->mutex;
-				pthread_mutex_lock(&tm);
+				pthread_mutex_lock(&parent->mutex);
     			parent->right = NULL;
-				pthread_mutex_unlock(&tm);
+				pthread_mutex_unlock(&parent->mutex);
     		}
     	}
     	else {
-			pthread_mutex_t tm = parent->right->mutex;
-			pthread_mutex_lock(&tm);
+			pthread_mutex_lock(&parent->mutex);
     		parent->right = NULL;
-			pthread_mutex_unlock(&tm);
+			pthread_mutex_unlock(&parent->mutex);
     	}
     }
     else if (temp->left != NULL && temp->right != NULL) {
        	//printf("both not null : %d\n", key);
     	temp = temp->left;
     	if (temp->right == NULL) {
-			pthread_mutex_lock(&del->mutex);
+			//pthread_mutex_lock(&del->mutex);
     		del->key = temp->key;
     		del->left = temp->left;
-			pthread_mutex_unlock(&del->mutex);
+			//pthread_mutex_unlock(&del->mutex);
     	}
     	else {
     		while (1) {
     			if (temp->right == NULL) {
-					pthread_mutex_t tm = del->mutex;
-					pthread_mutex_lock(&tm);
+					pthread_mutex_lock(&del->mutex);
     				del->key = temp->key;
     				if (temp->left)
 	    				parent->right = temp->left;
 	    			else
 	    				parent->right = NULL;
-					pthread_mutex_unlock(&tm);
+					pthread_mutex_unlock(&del->mutex);
     				break;
     			}
     			else {
@@ -388,76 +383,66 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
        	//printf("temp : %d\n", temp->key);
        	if (temp == tree->root) {
 			if (temp->left) {
-				pthread_mutex_t tm = tree->root->mutex;
-				pthread_mutex_lock(&tm);
+				pthread_mutex_lock(&tree->mutex);
 				tree->root = temp->left;
-				pthread_mutex_unlock(&tm);
+				pthread_mutex_unlock(&tree->mutex);
 			}
 			else {
-				pthread_mutex_t tm = tree->root->mutex;
-				pthread_mutex_lock(&tm);
+				pthread_mutex_lock(&tree->mutex);
 				tree->root = temp->right;
-				pthread_mutex_unlock(&tm);
+				pthread_mutex_unlock(&tree->mutex);
 			}
 			return 0;
 		}
     	if (temp->right != NULL) {
     		if (parent->left) {
     			if (parent->left->key == key) {
-					pthread_mutex_t tm = parent->left->mutex;
-					pthread_mutex_lock(&tm);
+					pthread_mutex_lock(&parent->mutex);
 	    			parent->left = temp->right;
-					pthread_mutex_unlock(&tm);
+					pthread_mutex_unlock(&parent->mutex);
 	    		}
 	    		else {
-					pthread_mutex_t tm = parent->right->mutex;
-					pthread_mutex_lock(&tm);
+					pthread_mutex_lock(&parent->mutex);
 	    			parent->right = temp->right;
-					pthread_mutex_unlock(&tm);
+					pthread_mutex_unlock(&parent->mutex);
 	    		}
     		}
     		else {
     			if (parent->right->key == key) {
-					pthread_mutex_t tm = parent->right->mutex;
-					pthread_mutex_lock(&tm);
+					pthread_mutex_lock(&parent->mutex);
 	    			parent->right = temp->right;
-					pthread_mutex_unlock(&tm);
+					pthread_mutex_unlock(&parent->mutex);
 	    		}
 	    		else {
-					pthread_mutex_t tm = parent->left->mutex;
-					pthread_mutex_lock(&tm);
+					pthread_mutex_lock(&parent->mutex);
 	    			parent->left = temp->right;
-					pthread_mutex_unlock(&tm);
+					pthread_mutex_unlock(&parent->mutex);
 	    		}
     		}
     	}
     	else {
     		if (parent->left) {
     			if (parent->left->key == key) {
-					pthread_mutex_t tm = parent->left->mutex;
-					pthread_mutex_lock(&tm);
+					pthread_mutex_lock(&parent->mutex);
 	    			parent->left = temp->left;
-					pthread_mutex_unlock(&tm);
+					pthread_mutex_unlock(&parent->mutex);
 	    		}
 	    		else {
-					pthread_mutex_t tm = parent->right->mutex;
-					pthread_mutex_lock(&tm);
+					pthread_mutex_lock(&parent->mutex);
 	    			parent->right = temp->left;
-					pthread_mutex_unlock(&tm);
+					pthread_mutex_unlock(&parent->mutex);
 	    		}
     		}
     		else {
     			if (parent->right->key == key) {
-					pthread_mutex_t tm = parent->right->mutex;
-					pthread_mutex_lock(&tm);
+					pthread_mutex_lock(&parent->mutex);
 	    			parent->right = temp->left;
-					pthread_mutex_unlock(&tm);
+					pthread_mutex_unlock(&parent->mutex);
 	    		}
 	    		else {
-					pthread_mutex_t tm = parent->left->mutex;
-					pthread_mutex_lock(&tm);
+					pthread_mutex_lock(&parent->mutex);
 	    			parent->left = temp->left;
-					pthread_mutex_unlock(&tm);
+					pthread_mutex_unlock(&parent->mutex);
 	    		}
     		}
 	    }
@@ -475,13 +460,13 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
  */
 int lab2_node_remove_cg(lab2_tree *tree, int key) {
     // You need to implement lab2_node_remove_cg function.
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&tree->mutex);
     lab2_node *temp = tree->root;
     lab2_node *parent = temp;
     lab2_node *del;
 
-	if (tree->root == NULL) {
+	if (tree->root != NULL) {
+    	pthread_mutex_unlock(&tree->mutex);
 		return 0;
 	}
     while (temp->key != key) {
@@ -497,6 +482,7 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
     	//printf("both null : %d\n", key);
  		if (temp == tree->root) {
  			tree->root = NULL;
+    		pthread_mutex_unlock(&tree->mutex);
  			return 0;
  		}
     	if (parent->left) {
@@ -540,6 +526,7 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
 				tree->root = temp->left;
 			else
 				tree->root = temp->right;
+    		pthread_mutex_unlock(&tree->mutex);
 			return 0;
 		}
 		
@@ -576,7 +563,7 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
     		}
 	    }
 	}
-	pthread_mutex_unlock(&mutex);
+	pthread_mutex_unlock(&tree->mutex);
 }
 
 

@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
     }else{
         goto INVALID_ARGS;
     }
-
+printf("success!\n");
     return LAB2_SUCCESS;
 INVALID_ARGS:
     lab2_sync_usage(argv[0]);
