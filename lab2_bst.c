@@ -322,8 +322,10 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
     lab2_node *mutexNode;
     if (temp == tree->root)
     	mutexNode = temp;
-    else
+    else if (temp->parent == tree->root)
     	mutexNode = temp->parent;
+    else
+    	mutexNode = temp->parent->parent;
     pthread_mutex_lock(&mutexNode->mutex);
     if (temp->left == NULL && temp->right == NULL) {
  		if (temp == tree->root) {
@@ -351,7 +353,9 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
     			del->left = NULL;
     	}
     	else
-    		while (1)
+    		while (1) {
+    			lab2_node *tempMutexNode = temp;
+    			pthread_mutex_lock(&tempMutexNode->mutex);
     			if (temp->right == NULL) {	
     				del->key = temp->key;
     				if (temp->left) {
@@ -360,10 +364,13 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
 	    			}
 	    			else
 	    				temp->parent->right = NULL;
+	    			pthread_mutex_unlock(&tempMutexNode->mutex);
     				break;
     			}
     			else
     				temp = temp->right;
+   				pthread_mutex_unlock(&tempMutexNode->mutex);
+    		}
     }
     else {
        	if (temp == tree->root) {
