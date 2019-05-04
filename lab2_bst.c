@@ -68,6 +68,7 @@ lab2_node * lab2_node_create(int key) {
 	pthread_mutex_init(&res->mutex, NULL);
     res->left = NULL;
     res->right = NULL;
+    res->parent = NULL;
     res->key = key;
     return res;
 }
@@ -92,6 +93,7 @@ int lab2_node_insert(lab2_tree *tree, lab2_node *new_node){
 			if (temp->key > new_node->key)
 				if (temp->left == NULL) {
 					temp->left = new_node;
+					new_node->parent = temp;
 					break;
 				}
 				else
@@ -99,10 +101,13 @@ int lab2_node_insert(lab2_tree *tree, lab2_node *new_node){
 			else if (temp->key < new_node->key)
 				if (temp->right == NULL) {
 					temp->right = new_node;
+					new_node->parent = temp;
 					break;
 				}
 				else
 					temp = temp->right;
+			else
+				break;
 		}
 		//printf("new node key : %d\n", new_node->key);
 	}
@@ -131,6 +136,7 @@ int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
 				if (temp->left == NULL) {
     				pthread_mutex_lock(&temp->mutex);
 					temp->left = new_node;
+					new_node->parent = temp;
     				pthread_mutex_unlock(&temp->mutex);
 					break;
 				}
@@ -140,11 +146,14 @@ int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
 				if (temp->right == NULL) {
     				pthread_mutex_lock(&temp->mutex);
 					temp->right = new_node;
+					new_node->parent = temp;
     				pthread_mutex_unlock(&temp->mutex);
 					break;
 				}
 				else
 					temp = temp->right;
+			else
+				break;
 		}
 		//printf("new node key : %d\n", new_node->key);
 	}
@@ -171,6 +180,7 @@ int lab2_node_insert_cg(lab2_tree *tree, lab2_node *new_node){
 			if (temp->key > new_node->key)
 				if (temp->left == NULL) {
 					temp->left = new_node;
+					new_node->parent = temp;
 					break;
 				}
 				else
@@ -178,10 +188,13 @@ int lab2_node_insert_cg(lab2_tree *tree, lab2_node *new_node){
 			else if (temp->key < new_node->key)
 				if (temp->right == NULL) {
 					temp->right = new_node;
+					new_node->parent = temp;
 					break;
 				}
 				else
 					temp = temp->right;
+			else
+				break;
 		}
 		//printf("new node key : %d\n", new_node->key);
 	}
