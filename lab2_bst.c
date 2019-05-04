@@ -19,17 +19,6 @@
 
 #include "lab2_sync_types.h"
 
-struct lab2_node {
-	int value;
-	struct lab2_node parent;
-	struct lab2_node left;
-	struct lab2_node right;
-};
-
-struct lab2_tree {
-	struct lab2_node root;
-};
-
 /*
  * TODO
  *  Implement funtction which traverse BST in in-order
@@ -50,7 +39,9 @@ int lab2_node_print_inorder(lab2_tree *tree) {
  */
 lab2_tree *lab2_tree_create() {
     // You need to implement lab2_tree_create function.
-    struct lab2_tree res = malloc (sizeof(struct lab2_tree))
+    struct lab2_tree *res = malloc (sizeof(struct lab2_tree));
+	res->root = NULL;
+	return res;
 }
 
 /*
@@ -63,11 +54,11 @@ lab2_tree *lab2_tree_create() {
  */
 lab2_node * lab2_node_create(int key) {
     // You need to implement lab2_node_create function.
-    struct lab2_node res = malloc(sizeof(struct lab2_node));
-    res.value = key;
-    res.parent = NULL;
-    res.left = NULL;
-    res.right = NULL;
+    struct lab2_node *res = malloc(sizeof(struct lab2_node));
+	pthread_mutex_init(&res->mutex, NULL);
+    res->left = NULL;
+    res->right = NULL;
+    res->key = key;
     return res;
 }
 
@@ -81,7 +72,28 @@ lab2_node * lab2_node_create(int key) {
  */
 int lab2_node_insert(lab2_tree *tree, lab2_node *new_node){
     // You need to implement lab2_node_insert function.
-
+	if (tree->root == NULL)
+		tree->root = new_node;
+	else {
+		lab2_node *temp = tree->root;
+		while (1) {
+			if (temp->key > new_node->key)
+				if (temp->left == NULL) {
+					temp->left = new_node;
+					break;
+				}
+				else
+					temp = temp->left;
+			else if (temp->key < new_node->key)
+				if (temp->right == NULL) {
+					temp->right = new_node;
+					break;
+				}
+				else
+					temp = temp->right;
+		}
+		printf("new node key : %d\n", new_node->key);
+	}
 }
 
 /* 
@@ -118,6 +130,66 @@ int lab2_node_insert_cg(lab2_tree *tree, lab2_node *new_node){
  */
 int lab2_node_remove(lab2_tree *tree, int key) {
     // You need to implement lab2_node_remove function.
+    lab2_node *temp = tree->root;
+    lab2_node *parent;
+    lab2_node *del;
+
+    while (temp->key != key) {
+    	parent = temp;
+    	if (temp->key > key)
+    		temp = temp->left;
+    	else
+    		temp = temp->right;
+    }
+    del = temp;
+    
+    if (temp->left == NULL && temp->right == NULL) {
+    	printf("both null\n");
+    	if (parent->left)
+    		if (temp->key == parent->left->key)
+    			parent->left = NULL;
+    		else
+    			parent->right = NULL;
+    	else
+    		parent->right = NULL;
+    }
+    else if (temp->left != NULL && temp->right != NULL) {
+       	printf("both not null\n");
+    	temp = temp->left;
+    	if (temp->right == NULL) {
+    		del->key = temp->key;
+    		del->left = temp->left;
+    	}
+    	else {
+    		while (1) {
+    			if (temp->right == NULL) {	
+    				del->key = temp->key;
+    				if (temp->left)
+	    				parent->right = temp->left;
+	    			else
+	    				parent->right = NULL;
+    				break;
+    			}
+    			else {
+    				parent = temp;
+    				temp = temp->right;
+    			}
+    		}
+    	}
+    }
+    else {
+       	printf("one null\n");
+    	if (temp->right != NULL)
+    		if (parent->left->key == key)
+    			parent->left = temp->right;
+    		else
+    			parent->right = temp->right;
+    	else
+    		if (parent->left->key == key)
+    			parent->left = temp->left;
+    		else
+    			parent->right = temp->left;
+    }
 }
 
 /* 
@@ -156,6 +228,7 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
  */
 void lab2_tree_delete(lab2_tree *tree) {
     // You need to implement lab2_tree_delete function.
+    free(tree);
 }
 
 /*
@@ -168,5 +241,6 @@ void lab2_tree_delete(lab2_tree *tree) {
  */
 void lab2_node_delete(lab2_node *node) {
     // You need to implement lab2_node_delete function.
+    free(node);
 }
 
