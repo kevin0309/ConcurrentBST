@@ -200,12 +200,11 @@ int lab2_node_remove(lab2_tree *tree, int key) {
 			tree->root = NULL;
 			return 0;
 		}
-		if (temp->parent->left) {
+		if (temp->parent->left)
 			if (temp->key == temp->parent->left->key)
 				temp->parent->left = NULL;
 			else
 				temp->parent->right = NULL;
-		}
 		else
 			temp->parent->right = NULL;
 	}
