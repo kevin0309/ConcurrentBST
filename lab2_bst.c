@@ -239,8 +239,8 @@ int lab2_node_remove(lab2_tree *tree, int key) {
     		else
     			del->left = NULL;
     	}
-    	else {
-    		while (1) {
+    	else
+    		while (1)
     			if (temp->right == NULL) {	
     				del->key = temp->key;
     				if (temp->left) {
@@ -251,11 +251,8 @@ int lab2_node_remove(lab2_tree *tree, int key) {
 	    				temp->parent->right = NULL;
     				break;
     			}
-    			else {
+    			else
     				temp = temp->right;
-    			}
-    		}
-    	}
     }
     else {
        	if (temp == tree->root) {
@@ -272,27 +269,23 @@ int lab2_node_remove(lab2_tree *tree, int key) {
 		
     	if (temp->right) {
 			temp->right->parent = temp->parent;
-    		if (temp->parent->left) {
+    		if (temp->parent->left)
     			if (temp->parent->left->key == key)
 	    			temp->parent->left = temp->right;
 	    		else
 	    			temp->parent->right = temp->right;
-    		}
-    		else {
+    		else
     			temp->parent->right = temp->right;
-    		}
     	}
     	else {
 			temp->left->parent = temp->parent;
-    		if (temp->parent->left) {
+    		if (temp->parent->left)
     			if (temp->parent->left->key == key)
 	    			temp->parent->left = temp->left;
 	    		else
 	    			temp->parent->right = temp->left;
-    		}
-    		else {
+    		else
     			temp->parent->right = temp->left;
-    		}
 	    }
 	}
 }
@@ -310,11 +303,8 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
     lab2_node *temp = tree->root;
     lab2_node *del;
 
-	//printf("remove 1 : %d\n", key);
-	if (tree->root == NULL) {
+	if (tree->root == NULL)
 		return 0;
-	}
-	//printf("remove 2 : %d\n", key);
     while (temp->key != key) {
     	if (temp->key > key)
     		temp = temp->left;
@@ -323,13 +313,9 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
     	if (temp == NULL)
     		return 0;
     }
-	//printf("remove 3 : %d\n", key);
     del = temp;
-	//lab2_node_print_inorder(tree);
     if (temp->left == NULL && temp->right == NULL) {
-    	//printf("both null : %d\n", key);
  		if (temp == tree->root) {
-    		//printf("both null root : %d\n", key);
     		pthread_mutex_lock(&tree->mutex);
  			tree->root = NULL;
     		pthread_mutex_unlock(&tree->mutex);
@@ -354,30 +340,21 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
     	}
     }
     else if (temp->left != NULL && temp->right != NULL) {
-       	//printf("both not null : %d\n", key);
     	temp = temp->left;
     	if (temp->right == NULL) {
     		pthread_mutex_lock(&del->mutex);
     		del->key = temp->key;
-    		//printf("both not null 1 : %d\n", key);
     		if (temp->left) {
-    			//printf("both not null 4 : %d\n", key);
     			temp->left->parent = del;
-    			//printf("both not null 5 : %d\n", key);
     			del->left = temp->left;
     		}
-    		else {
-    			//printf("both not null 6 : %d\n", key);
+    		else
     			del->left = NULL;
-    			//printf("both not null 7 : %d\n", key);
-    		}
     		pthread_mutex_unlock(&del->mutex);
     	}
     	else {
-    		//printf("both not null 2 : %d\n", key);
-    		while (1) {
+    		while (1)
     			if (temp->right == NULL) {	
-    				//printf("both not null 3 : %d\n", key);
     				pthread_mutex_lock(&del->mutex);
     				del->key = temp->key;
     				if (temp->left) {
@@ -389,15 +366,11 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
     				pthread_mutex_unlock(&del->mutex);
     				break;
     			}
-    			else {
+    			else
     				temp = temp->right;
-    			}
-    		}
     	}
     }
     else {
-       	//printf("one null %d\n", key);
-       	//printf("temp : %d\n", temp->key);
        	if (temp == tree->root) {
 			if (temp->left) {
     			pthread_mutex_lock(&temp->mutex);
@@ -415,35 +388,27 @@ int lab2_node_remove_fg(lab2_tree *tree, int key) {
 		}
 		
     	if (temp->right) {
-    		//printf("b1\n");
 			pthread_mutex_lock(&temp->parent->mutex);
 			temp->right->parent = temp->parent;
-    		if (temp->parent->left) {
-    			//printf("plk : %d\n", temp->parent->left->key);
+    		if (temp->parent->left)
     			if (temp->parent->left->key == key)
 	    			temp->parent->left = temp->right;
 	    		else
 	    			temp->parent->right = temp->right;
-    		}
-    		else {
+    		else
     			temp->parent->right = temp->right;
-    		}
 			pthread_mutex_unlock(&temp->parent->mutex);
     	}
     	else {
-	   		//printf("b2\n");
 			pthread_mutex_lock(&temp->parent->mutex);
 			temp->left->parent = temp->parent;
-    		if (temp->parent->left) {
-    			//printf("plk : %d\n", temp->parent->left->key);
+    		if (temp->parent->left)
     			if (temp->parent->left->key == key)
 	    			temp->parent->left = temp->left;
 	    		else
 	    			temp->parent->right = temp->left;
-    		}
-    		else {
+    		else
     			temp->parent->right = temp->left;
-    		}
 			pthread_mutex_unlock(&temp->parent->mutex);
 	    }
 	}
@@ -464,12 +429,10 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
     lab2_node *temp = tree->root;
     lab2_node *del;
 
-	//printf("remove 1 : %d\n", key);
 	if (tree->root == NULL) {
 		pthread_mutex_unlock(&tree->mutex);
 		return 0;
 	}
-	//printf("remove 2 : %d\n", key);
     while (temp->key != key) {
     	if (temp->key > key)
     		temp = temp->left;
@@ -480,49 +443,35 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
     		return 0;
     	}
     }
-	//printf("remove 3 : %d\n", key);
     del = temp;
-	//lab2_node_print_inorder(tree);
     if (temp->left == NULL && temp->right == NULL) {
-    	//printf("both null : %d\n", key);
  		if (temp == tree->root) {
-    		//printf("both null root : %d\n", key);
  			tree->root = NULL;
 			pthread_mutex_unlock(&tree->mutex);
  			return 0;
  		}
-    	if (temp->parent->left) {
+    	if (temp->parent->left)
     		if (temp->key == temp->parent->left->key)
     			temp->parent->left = NULL;
     		else
     			temp->parent->right = NULL;
-    	}
     	else
     		temp->parent->right = NULL;
     }
     else if (temp->left != NULL && temp->right != NULL) {
-       	//printf("both not null : %d\n", key);
     	temp = temp->left;
     	if (temp->right == NULL) {
     		del->key = temp->key;
-    		//printf("both not null 1 : %d\n", key);
     		if (temp->left) {
-    			//printf("both not null 4 : %d\n", key);
     			temp->left->parent = del;
-    			//printf("both not null 5 : %d\n", key);
     			del->left = temp->left;
     		}
-    		else {
-    			//printf("both not null 6 : %d\n", key);
+    		else
     			del->left = NULL;
-    			//printf("both not null 7 : %d\n", key);
-    		}
     	}
     	else {
-    		//printf("both not null 2 : %d\n", key);
-    		while (1) {
+    		while (1)
     			if (temp->right == NULL) {	
-    				//printf("both not null 3 : %d\n", key);
     				del->key = temp->key;
     				if (temp->left) {
     					temp->left->parent = temp->parent;
@@ -532,15 +481,11 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
 	    				temp->parent->right = NULL;
     				break;
     			}
-    			else {
+    			else
     				temp = temp->right;
-    			}
-    		}
     	}
     }
     else {
-       	//printf("one null %d\n", key);
-       	//printf("temp : %d\n", temp->key);
        	if (temp == tree->root) {
 			if (temp->left) {
 				temp->left->parent = NULL;
@@ -555,32 +500,24 @@ int lab2_node_remove_cg(lab2_tree *tree, int key) {
 		}
 		
     	if (temp->right) {
-    		//printf("b1\n");
 			temp->right->parent = temp->parent;
-    		if (temp->parent->left) {
-    			//printf("plk : %d\n", temp->parent->left->key);
+    		if (temp->parent->left)
     			if (temp->parent->left->key == key)
 	    			temp->parent->left = temp->right;
 	    		else
 	    			temp->parent->right = temp->right;
-    		}
-    		else {
+    		else
     			temp->parent->right = temp->right;
-    		}
     	}
     	else {
-	   		//printf("b2\n");
 			temp->left->parent = temp->parent;
-    		if (temp->parent->left) {
-    			//printf("plk : %d\n", temp->parent->left->key);
+    		if (temp->parent->left)
     			if (temp->parent->left->key == key)
 	    			temp->parent->left = temp->left;
 	    		else
 	    			temp->parent->right = temp->left;
-    		}
-    		else {
+    		else
     			temp->parent->right = temp->left;
-    		}
 	    }
 	}
 	pthread_mutex_unlock(&tree->mutex);

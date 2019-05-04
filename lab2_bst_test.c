@@ -112,23 +112,18 @@ void bst_test(int num_threads,int node_count){
     for (i=0; i < node_count; i++) { 
         data[i] = rand();
     }
-//printf("get threads start!\n");
     if (!(threads = (thread_arg*)malloc(sizeof(thread_arg) * num_threads)))
         abort();
-//printf("get threads end!\n");
     /*
      * single thread insert test.
      */
     gettimeofday(&tv_start, NULL);
     printf("\n");
     tree = lab2_tree_create();
-//printf("single thread insert start!\n");
     for (i=0 ; i < node_count ; i++) {
-//printf("single thread inserting...! : %d/%d : %d\n", i, node_count, data[i]);               
         lab2_node* node = lab2_node_create(data[i]);
         lab2_node_insert(tree, node);
     }
-//printf("single thread insert end!\n");
 
     gettimeofday(&tv_end, NULL);
     exe_time = get_timeval(&tv_start, &tv_end);
@@ -301,7 +296,6 @@ int main(int argc, char *argv[])
                 goto INVALID_ARGS;
         }
     }
-printf("start!\n");
     if((num_threads>0) && (node_count > 0)){
         bst_test(num_threads,node_count);
     }else{
