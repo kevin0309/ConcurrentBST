@@ -19,12 +19,13 @@
 
 #include "lab2_sync_types.h"
 
-void inorder_recur(lab2_node *node) {
+void inorder_recur(lab2_node *node, int *sum) {
 	if (node == NULL)
 		return;
-	inorder_recur(node->left);
-	printf("%d ", node->key);
-	inorder_recur(node->right);
+	inorder_recur(node->left, sum);
+	//printf("%d ", node->key);
+	*sum = *sum+1;
+	inorder_recur(node->right, sum);
 }
 
 /*
@@ -36,8 +37,9 @@ void inorder_recur(lab2_node *node) {
  */
 int lab2_node_print_inorder(lab2_tree *tree) {
 	// You need to implement lab2_node_print_inorder function.
-	inorder_recur(tree->root);
-	return 0;
+	int sum = 0;
+	inorder_recur(tree->root, &sum);
+	return sum;
 }
 
 /*
