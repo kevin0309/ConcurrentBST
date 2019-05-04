@@ -92,16 +92,16 @@ int lab2_node_insert(lab2_tree *tree, lab2_node *new_node){
 		while (1) {
 			if (temp->key > new_node->key)
 				if (temp->left == NULL) {
-					temp->left = new_node;
 					new_node->parent = temp;
+					temp->left = new_node;
 					break;
 				}
 				else
 					temp = temp->left;
 			else if (temp->key < new_node->key)
 				if (temp->right == NULL) {
-					temp->right = new_node;
 					new_node->parent = temp;
+					temp->right = new_node;
 					break;
 				}
 				else
@@ -135,8 +135,8 @@ int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
 			if (temp->key > new_node->key)
 				if (temp->left == NULL) {
     				pthread_mutex_lock(&temp->mutex);
-					temp->left = new_node;
 					new_node->parent = temp;
+					temp->left = new_node;
     				pthread_mutex_unlock(&temp->mutex);
 					break;
 				}
@@ -145,8 +145,8 @@ int lab2_node_insert_fg(lab2_tree *tree, lab2_node *new_node){
 			else if (temp->key < new_node->key)
 				if (temp->right == NULL) {
     				pthread_mutex_lock(&temp->mutex);
-					temp->right = new_node;
 					new_node->parent = temp;
+					temp->right = new_node;
     				pthread_mutex_unlock(&temp->mutex);
 					break;
 				}
@@ -179,16 +179,16 @@ int lab2_node_insert_cg(lab2_tree *tree, lab2_node *new_node){
 		while (1) {
 			if (temp->key > new_node->key)
 				if (temp->left == NULL) {
-					temp->left = new_node;
 					new_node->parent = temp;
+					temp->left = new_node;
 					break;
 				}
 				else
 					temp = temp->left;
 			else if (temp->key < new_node->key)
 				if (temp->right == NULL) {
-					temp->right = new_node;
 					new_node->parent = temp;
+					temp->right = new_node;
 					break;
 				}
 				else
@@ -214,21 +214,26 @@ int lab2_node_remove(lab2_tree *tree, int key) {
     lab2_node *temp = tree->root;
     lab2_node *del;
 
+	//printf("remove 1 : %d\n", key);
 	if (tree->root == NULL) {
 		return 0;
 	}
+	//printf("remove 2 : %d\n", key);
     while (temp->key != key) {
     	if (temp->key > key)
     		temp = temp->left;
     	else
     		temp = temp->right;
+    	if (temp == NULL)
+    		return 0;
     }
+	//printf("remove 3 : %d\n", key);
     del = temp;
 	//lab2_node_print_inorder(tree);
     if (temp->left == NULL && temp->right == NULL) {
-    	printf("both null : %d\n", key);
+    	//printf("both null : %d\n", key);
  		if (temp == tree->root) {
-    		printf("both null root : %d\n", key);
+    		//printf("both null root : %d\n", key);
  			tree->root = NULL;
  			return 0;
  		}
@@ -242,21 +247,28 @@ int lab2_node_remove(lab2_tree *tree, int key) {
     		temp->parent->right = NULL;
     }
     else if (temp->left != NULL && temp->right != NULL) {
-       	printf("both not null : %d\n", key);
+       	//printf("both not null : %d\n", key);
     	temp = temp->left;
     	if (temp->right == NULL) {
     		del->key = temp->key;
-    		printf("both not null 1 : %d\n", key);
+    		//printf("both not null 1 : %d\n", key);
     		if (temp->left) {
+    			//printf("both not null 4 : %d\n", key);
     			temp->left->parent = del;
+    			//printf("both not null 5 : %d\n", key);
     			del->left = temp->left;
+    		}
+    		else {
+    			//printf("both not null 6 : %d\n", key);
+    			del->left = NULL;
+    			//printf("both not null 7 : %d\n", key);
     		}
     	}
     	else {
-    		printf("both not null 2 : %d\n", key);
+    		//printf("both not null 2 : %d\n", key);
     		while (1) {
     			if (temp->right == NULL) {	
-    				printf("both not null 3 : %d\n", key);
+    				//printf("both not null 3 : %d\n", key);
     				del->key = temp->key;
     				if (temp->left) {
     					temp->left->parent = temp->parent;
@@ -273,7 +285,7 @@ int lab2_node_remove(lab2_tree *tree, int key) {
     	}
     }
     else {
-       	printf("one null %d\n", key);
+       	//printf("one null %d\n", key);
        	//printf("temp : %d\n", temp->key);
        	if (temp == tree->root) {
 			if (temp->left) {
@@ -287,7 +299,7 @@ int lab2_node_remove(lab2_tree *tree, int key) {
 			return 0;
 		}
 		
-    	if (temp->right != NULL) {
+    	if (temp->right) {
     		//printf("b1\n");
 			temp->right->parent = temp->parent;
     		if (temp->parent->left) {
@@ -298,10 +310,7 @@ int lab2_node_remove(lab2_tree *tree, int key) {
 	    			temp->parent->right = temp->right;
     		}
     		else {
-    			if (temp->parent->right->key == key)
-	    			temp->parent->right = temp->right;
-	    		else
-	    			temp->parent->left = temp->right;
+    			temp->parent->right = temp->right;
     		}
     	}
     	else {
@@ -315,10 +324,7 @@ int lab2_node_remove(lab2_tree *tree, int key) {
 	    			temp->parent->right = temp->left;
     		}
     		else {
-    			if (temp->parent->right->key == key)
-	    			temp->parent->right = temp->left;
-	    		else
-	    			temp->parent->left = temp->left;
+    			temp->parent->right = temp->left;
     		}
 	    }
 	}
