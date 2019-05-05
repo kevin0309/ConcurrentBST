@@ -86,7 +86,6 @@ void* thread_job_insert(void *arg){
     int *data = th_arg->data_set;
     int start = th_arg->start, end = th_arg->end;
     int i;
-
     for (i=start ; i < end ; i++) {               
         lab2_node* node = lab2_node_create(data[i]);
         if(is_sync == LAB2_TYPE_FINEGRAINED)
@@ -145,7 +144,7 @@ void bst_test(int num_threads,int node_count){
         th_arg->start = i*term;
         th_arg->end = (i+1)*term;
 
-        pthread_create(&threads[i].thread,NULL,thread_job_insert,(void*)th_arg);
+        pthread_create(&th_arg->thread,NULL,thread_job_insert,(void*)th_arg);
     }
 
     for (i = 0; i < num_threads; i++)
@@ -171,7 +170,7 @@ void bst_test(int num_threads,int node_count){
         th_arg->start = i*term;
         th_arg->end = (i+1)*term;
 
-        pthread_create(&threads[i].thread,NULL,thread_job_insert,(void*)th_arg);
+        pthread_create(&th_arg->thread,NULL,thread_job_insert,(void*)th_arg);
     }
 
     for (i = 0; i < num_threads; i++)
@@ -225,9 +224,8 @@ void bst_test(int num_threads,int node_count){
         th_arg->start = i*term;
         th_arg->end = (i+1)*term;
 
-        pthread_create(&threads[i].thread,NULL,thread_job_delete,(void*)th_arg);
+        pthread_create(&th_arg->thread,NULL,thread_job_delete,(void*)th_arg);
     }
-
     for (i = 0; i < num_threads; i++)
         pthread_join(threads[i].thread, NULL);
     gettimeofday(&tv_delete_end, NULL);
@@ -258,9 +256,8 @@ void bst_test(int num_threads,int node_count){
         th_arg->start = i*term;
         th_arg->end = (i+1)*term;
 
-        pthread_create(&threads[i].thread,NULL,thread_job_delete,(void*)th_arg);
+        pthread_create(&th_arg->thread,NULL,thread_job_delete,(void*)th_arg);
     }
-
     for (i = 0; i < num_threads; i++)
         pthread_join(threads[i].thread, NULL);
 
